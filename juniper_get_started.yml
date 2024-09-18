@@ -1,0 +1,30 @@
+---
+- name: Get Device Facts
+  hosts: juniper
+  connection: local
+  gather_facts: no
+  vars:
+    backup: True
+
+  tasks:
+    - name: Enable NETCONF
+        connection: ansible.netcommon.network_cli
+        junipernetworks.junos.junos_netconf:
+        when: ansible_network_os == 'junipernetworks.junos.junos'
+
+    - name: Gather legacy and resource facts
+      junipernetworks.junos.junos_facts:
+        gather_subset: all
+        # gather_network_resources: all
+
+    - name: Print network_resources
+      debug:
+        msg: "{{ ansible_facts }}"
+
+
+    # - name: Backup current switch config (junos)
+    #   junipernetworks.junos.junos_config:
+    #     backup: yes
+    #   register: backup_junos_location
+    #   when: 
+    #     - ansible_network_os == 'junipernetworks.junos.junos'

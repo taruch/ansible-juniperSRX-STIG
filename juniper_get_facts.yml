@@ -1,0 +1,153 @@
+---
+- name: Get Device Facts
+  hosts: juniper
+  connection: local
+  # connection: juniper.device.pyez
+  gather_facts: no
+  vars:
+    backup: True
+
+  tasks:
+    # - name: Backup current switch config (junos)
+    #   junipernetworks.junos.junos_config:
+    #     backup: yes
+    #   register: backup_junos_location
+    #   when: 
+    #     - ansible_network_os == 'junipernetworks.junos.junos'
+
+    - name: Gather legacy and resource facts
+      junipernetworks.junos.junos_facts:
+        gather_subset: all
+        # gather_network_resources: all
+
+    - name: Print network_resources
+      debug:
+        msg: "{{ ansible_facts }}"
+
+    - name: Gather junos interfaces facts
+      junipernetworks.junos.junos_l2_interfaces:
+        state: gathered
+      register: interfaces
+
+    - name: Print interfaces
+      debug:
+        msg: "{{ interfaces }}"
+
+    - name: Gather junos layer 2 interfaces facts
+      junipernetworks.junos.junos_l2_interfaces:
+        state: gathered
+      register: l2_interfaces
+
+    - name: Print l2_interfaces
+      debug:
+        msg: "{{ l2_interfaces }}"
+
+    - name: Gather junos layer 3 interfaces facts
+      junipernetworks.junos.junos_l3_interfaces:
+        state: gathered
+      register: l3_interfaces
+
+    - name: Print l3_interfaces
+      debug:
+        msg: "{{ l3_interfaces }}"        
+
+    - name: Gather Junos OSPFv2 running-configuration
+      junipernetworks.junos.junos_ospfv2:
+        config:
+        state: gathered
+      register: ospfv2_config
+
+    - name: Print ospfv2_config
+      debug:
+        msg: "{{ ospfv2_config }}"
+
+    - name: Gather Junos OSPFv3 running-configuration
+      junipernetworks.junos.junos_ospfv3:
+        config:
+        state: gathered
+      register: ospfv3_config
+
+    - name: Print ospfv3_config
+      debug:
+        msg: "{{ ospfv3_config }}"
+
+    - name: Gather junos lacp as in given arguments
+      junipernetworks.junos.junos_lacp:
+        state: gathered
+      register: lacp_config
+
+    - name: Print lacp_config
+      debug:
+        msg: "{{ lacp_config }}"
+
+    - name: Gather junos lldp_global as in given arguments
+      junipernetworks.junos.junos_lldp_global:
+        state: gathered
+      register: lldp_global_config
+
+    - name: Print lldp_global_config
+      debug:
+        msg: "{{ lldp_global_config }}"
+
+    - name: Gather junos lldp_interfaces as in given arguments
+      junipernetworks.junos.junos_lldp_interfaces:
+        state: gathered
+      register: lldp_interfaces_config
+
+    - name: Print lldp_interfaces_config
+      debug:
+        msg: "{{ lldp_interfaces_config }}"
+
+    - name: Gather junos lag interfaces as in given arguments
+      junipernetworks.junos.junos_lag_interfaces:
+        state: gathered
+      register: lag_config
+
+    - name: Print lag_config
+      debug:
+        msg: "{{ lag_config }}"
+
+    - name: Gather static routes facts from the device using junos_static_routes module
+      junipernetworks.junos.junos_static_routes:
+        state: gathered
+      register: static_routes
+
+    - name: Print static_routes
+      debug:
+        msg: "{{ static_routes }}"
+
+    - name: Gather Junos routing-instances
+      junipernetworks.junos.junos_routing_instances:
+        state: gathered
+      register: routing_instances_config
+
+    - name: Print routing_instances_config
+      debug:
+        msg: "{{ routing_instances_config }}"
+
+    # - name: Checking NETCONF connectivity (Timeout 5 minutes)
+    #   wait_for:
+    #     host: "{{ inventory_hostname }}"
+    #     port: 830
+    #     timeout: 300
+    #   delegate_to: localhost
+
+    # # Command module executed
+    # - name: show version with command
+    #   juniper.device.command:
+    #     commands:
+    #       - "show version"
+    
+    # - name: Get facts
+    #   juniper.device.facts:
+
+    # - name: "Get selected configuration hierarchies"
+    #   vars:
+    #     ansible_connection: juniper.device.pyez
+    #   juniper.device.config:
+    #     retrieve: "committed"
+    #     filter: "<configuration><interfaces/><protocols/></configuration>"
+    #   register: response
+    # - name: "Print result"
+    #   debug:
+    #     var: response
