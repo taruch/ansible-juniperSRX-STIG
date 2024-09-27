@@ -5,12 +5,10 @@
   gather_facts: no
   vars:
     backup: True
-
+    ansible_connection: ansible.netcommon.network_cli
   tasks:
     - name: Enable NETCONF
       when: ansible_network_os == 'junipernetworks.junos.junos'
-      vars:
-        ansible_connection: ansible.netcommon.network_cli
       junipernetworks.junos.junos_netconf:
 
     - name: Gather legacy and resource facts
