@@ -1,6 +1,6 @@
 ---
 - name: Get Device Facts
-  hosts: juniper
+  hosts: all
   connection: local
   gather_facts: no
   vars:
