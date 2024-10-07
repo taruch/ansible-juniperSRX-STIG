@@ -1,0 +1,54 @@
+---
+- name: Get Device Facts
+  hosts: juniper
+  gather_facts: no
+  vars:
+    backup: True
+
+  tasks:
+    - name: Enable NETCONF
+      when: ansible_network_os == 'junipernetworks.junos.junos'
+      vars:
+        ansible_connection: ansible.netcommon.network_cli
+      junipernetworks.junos.junos_netconf:
+
+    - name: Gather legacy and resource facts
+      vars:
+        ansible_connection: ansible.netcommon.network_cli
+      junipernetworks.junos.junos_command:
+        commands:
+          - configure
+          - set security screen ids-option untrust-screen icmp ping-death
+          - set security screen ids-option untrust-screen ip bad-option
+          - set security screen ids-option untrust-screen ip record-route-option
+          - set security screen ids-option untrust-screen ip timestamp-option
+          - set security screen ids-option untrust-screen ip security-option
+          - set security screen ids-option untrust-screen ip stream-option
+          - set security screen ids-option untrust-screen ip spoofing
+          - set security screen ids-option untrust-screen ip source-route-option
+          - set security screen ids-option untrust-screen ip unknown-protocol
+          - set security screen ids-option untrust-screen ip tear-drop
+          - set security screen ids-option untrust-screen ip ipv6-extension-header hop-by-hop-header jumbo-payload-option
+          - set security screen ids-option untrust-screen ip ipv6-extension-header hop-by-hop-header router-alert-option
+          - set security screen ids-option untrust-screen ip ipv6-extension-header hop-by-hop-header quick-start-option
+          - set security screen ids-option untrust-screen ip ipv6-extension-header routing-header
+          - set security screen ids-option untrust-screen ip ipv6-extension-header fragment-header
+          - set security screen ids-option untrust-screen ip ipv6-extension-header no-next-header
+          - set security screen ids-option untrust-screen ip ipv6-extension-header shim6-header
+          - set security screen ids-option untrust-screen ip ipv6-extension-header mobility-header
+          - set security screen ids-option untrust-screen ip ipv6-malformed-header
+          - set security screen ids-option untrust-screen tcp syn-fin
+          - set security screen ids-option untrust-screen tcp fin-no-ack
+          - set security screen ids-option untrust-screen tcp tcp-no-flag
+          - set security screen ids-option untrust-screen tcp syn-frag
+          - set security screen ids-option untrust-screen tcp land
+          - commit
+
+
+    # - name: Backup current switch config (junos)
+    #   junipernetworks.junos.junos_config:
+    #     backup: yes
+    #   register: backup_junos_location
+    #   when: 
+    #     - ansible_network_os == 'junipernetworks.junos.junos'
+
