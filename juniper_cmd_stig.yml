@@ -4,13 +4,14 @@
   gather_facts: no
   vars:
     backup: True
-
+    ansible_network_os: junipernetworks.junos.junos
+    ansible_connection: ansible.netcommon.network_cli
   tasks:
-    - name: Enable NETCONF
-      when: ansible_network_os == 'junipernetworks.junos.junos'
-      vars:
-        ansible_connection: ansible.netcommon.network_cli
-      junipernetworks.junos.junos_netconf:
+    # - name: Enable NETCONF
+    #   when: ansible_network_os == 'junipernetworks.junos.junos'
+    #   vars:
+    #     ansible_connection: ansible.netcommon.network_cli
+    #   junipernetworks.junos.junos_netconf:
 
     - name: Gather legacy and resource facts
       vars:
@@ -43,6 +44,46 @@
           - set security screen ids-option untrust-screen tcp syn-frag
           - set security screen ids-option untrust-screen tcp land
           - commit
+
+    - name: set MOTD
+      ansible.builtin.set_fact:
+        motd: | 
+          You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.
+
+          By using this IS (which includes any device attached to this IS), you consent to the following conditions:
+
+          -The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.
+
+          -At any time, the USG may inspect and seize data stored on this IS.
+
+          -Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.
+
+          -This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for your personal benefit or privacy.
+
+          -Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.
+          
+
+    - name: debug motd
+      ansible.builtin.debug:
+        var: motd
+
+    - name: configure the login banner
+      vars:
+        ansible_connection: local
+      junipernetworks.junos.junos_banner:
+        banner: login
+        text: |
+          this is my login banner
+          that contains a multiline
+          string
+        state: present
+
+    - name: Gather legacy and resource facts
+      vars:
+        ansible_connection: ansible.netcommon.network_cli
+      junipernetworks.junos.junos_command:
+        commands:
+          - "set system login message '{{ motd }}'"
 
 
     # - name: Backup current switch config (junos)

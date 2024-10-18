@@ -1,0 +1,27 @@
+- name: gather jupiter facts
+  hosts: juniper
+  connection: local
+  #connection: juniper.device.pyez
+  gather_facts: false
+  become: false
+  vars:
+    connection_info:
+      host: "{{ ansible_ssh_host }}"
+      port: "{{ ansible_ssh_port }}"
+      user: "{{ ansible_ssh_user }}"
+      passwd: "{{ ansible_ssh_pass }}"
+
+  tasks:
+    - name: Get facts using juniper.device
+      juniper.device.facts:
+        config_format: set
+      register: command_output
+
+    - name: Print gathered facts
+      ansible.builtin.debug:
+        msg:
+          - "{{ ansible_facts.junos.config | split('\n') }}"
+          - "{{ ansible_facts }}"
+
+
+...

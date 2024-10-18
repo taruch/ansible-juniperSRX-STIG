@@ -1,6 +1,7 @@
 - name: gather jupiter facts
   hosts: juniper
   gather_facts: false
+  become: false
   vars:
     ansible_network_os: junipernetworks.junos.junos
     ansible_connection: ansible.netcommon.network_cli
@@ -11,14 +12,39 @@
     # ansible_libssh_password_prompt: "PASSCODE:"
 
   tasks:
+
+    - name: enable netconf service on port 830
+      junipernetworks.junos.junos_netconf:
+        listens_on: 830
+        state: present
+
     - name: Run show version on remote devices
       # ansible.netcommon.cli_command:
+      vars:
+        ansible_connection: ansible.netcommon.netconf
       junipernetworks.junos.junos_command:
-        commands: show version
+        commands: show configuration
       register: command_output
 
     - name: Print gathered facts
       ansible.builtin.debug:
         msg: "{{ command_output }}"
+
+    - name: Run junosSTIG_stigrule_253948_disable_non-essential_capabilitie
+      junipernetworks.junos.junos_command:
+        commands:
+          - configure
+          - delete system services finger
+          - delete system services ftp
+          - delete system services rlogin
+          - delete system services telnet
+          - delete system services xnm-clear-text
+          - delete system services tftp
+          - delete system services rest http
+          - delete system services web-management
+          - set system processes web-management disable
+          - commit
+      register: command_output
+
 
 ...
