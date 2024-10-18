@@ -19,7 +19,6 @@
     - name: Print gathered facts
       ansible.builtin.debug:
         msg:
-          - "{{ ansible_facts.junos.config | split('\n') }}"
           - "{{ ansible_facts }}"
 
 
