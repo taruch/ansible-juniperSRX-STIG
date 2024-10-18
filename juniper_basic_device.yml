@@ -14,8 +14,6 @@
   tasks:
     - name: Get facts using juniper.device
       juniper.device.facts:
-        config_format: json
-        savedir: "{{ playbook_dir }}/{{ inventory_hostname }}.json"
       register: command_output
 
     - name: Print gathered facts
