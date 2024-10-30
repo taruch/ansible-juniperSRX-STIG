@@ -1,7 +1,8 @@
-- name: gather jupiter facts
+---
+- name: Use the Jupiter Device Collection
   hosts: juniper
   connection: local
-  #connection: juniper.device.pyez
+  # connection: juniper.device.pyez
   gather_facts: false
   become: false
   vars:
@@ -20,6 +21,41 @@
       ansible.builtin.debug:
         msg:
           - "{{ ansible_facts }}"
+
+    # - name: V-253878
+    #   juniper.device.config:
+    #     load: "merge"
+    #     lines:
+    #       - set system services netconf ssh connection-limit 10
+    #       - set system services netconf ssh rate-limit 4
+    #   register: response
+
+    # - name: Print the response
+    #   ansible.builtin.debug:
+    #     var: response
+
+
+    - name: commit configuration
+      juniper.device.config:
+        load: 'set'
+        lines:
+          # - "set system login message \" |\\n 1. This computer system and each component thereof is, the sole and exclusive property of Tata Consultancy Services Limited (TCSL) and is intended solely for the usage of its employees and authorized clients.Unauthorized access or use will attract appropriate legal action.2. By usig or accessing this System. you expressly consent to:(a) be bound by all policies and regulations of TCSL.(b) be monitored by TCSL or its agents or representatives while you are using or accessing this System (including any data that is transmitted by you).(c) be liable for any loss that may be suffered by TCSL due to your use and or access of this System and fouryou agree to indemnify TCSL against all such losses.3.If fiveyou do not agree to any of the terms above then do not use and/or access this System.*******************************************************************************|\"\n\n"
+          # - "set system login message \"You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.\\n\\n\"\n\n"
+          - "set system login message \"You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.\\n\\nBy using this IS (which includes any device attached to this IS), you consent to the following conditions:\\n\\n-The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, \\n penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE),\\n and counterintelligence (CI) investigations.\\n\\n-At any time, the USG may inspect and seize data stored on this IS.\\n\\n-Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception,\\n and search, and may be disclosed or used for any USG-authorized purpose.\\n\\n-This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for your personal benefit or privacy.\\n\\n-Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of\\n privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy,\\n and their assistants. Such communications and work product are private and confidential. See User Agreement for details.\\n\\n\\n\\n\""
+        diff: True
+      register: response
+
+
+    # - name: Configure the login banner
+    #   juniper.device.config:
+    #     load: "replace"
+    #     format: json
+    #     lines:
+    #       - system {
+    #             login {
+    #                 message "You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.\n\nBy using;
+    #             }
+    #         }
 
 
 ...
