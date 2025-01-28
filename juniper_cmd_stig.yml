@@ -5,13 +5,14 @@
   vars:
     backup: True
     ansible_network_os: junipernetworks.junos.junos
-    ansible_connection: ansible.netcommon.network_cli
+    ansible_connection: ansible.netcommon.netconf
+    banner: 'original'
   tasks:
-    # - name: Enable NETCONF
-    #   when: ansible_network_os == 'junipernetworks.junos.junos'
-    #   vars:
-    #     ansible_connection: ansible.netcommon.network_cli
-    #   junipernetworks.junos.junos_netconf:
+    - name: Enable NETCONF
+      when: ansible_network_os == 'junipernetworks.junos.junos'
+      vars:
+        ansible_connection: ansible.netcommon.network_cli
+      junipernetworks.junos.junos_netconf:
 
     - name: Gather legacy and resource facts
       vars:
@@ -67,10 +68,19 @@
       ansible.builtin.debug:
         var: motd
 
-    - name: configure the login banner
-      vars:
-        ansible_connection: local
+    - name: Configure the login banner
+      when: banner == 'dod'
       ignore_errors: true
+      run_once: true
+      junipernetworks.junos.junos_banner:
+        banner: login
+        text: "{{ motd }}"
+        state: present
+
+    - name: Configure the login banner
+      when: banner == 'original'
+      ignore_errors: true
+      run_once: true
       junipernetworks.junos.junos_banner:
         banner: login
         text: |
@@ -79,18 +89,9 @@
           string
         state: present
 
-    - name: Gather legacy and resource facts
-      vars:
-        ansible_connection: ansible.netcommon.network_cli
-      junipernetworks.junos.junos_command:
-        commands:
-          - "set system login message '{{ motd }}'"
-
-
     # - name: Backup current switch config (junos)
     #   junipernetworks.junos.junos_config:
     #     backup: yes
     #   register: backup_junos_location
     #   when: 
     #     - ansible_network_os == 'junipernetworks.junos.junos'
-
