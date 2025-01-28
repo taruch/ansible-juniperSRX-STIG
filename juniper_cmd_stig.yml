@@ -70,6 +70,7 @@
     - name: configure the login banner
       vars:
         ansible_connection: local
+      ignore_erros: true
       junipernetworks.junos.junos_banner:
         banner: login
         text: |
